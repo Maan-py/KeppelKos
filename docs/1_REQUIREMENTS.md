@@ -33,6 +33,6 @@ Proyek ini menggunakan metode **Agile Iterative** dengan pembagian tugas sebagai
 1. **Planning & Analysis:** Mendefinisikan SRS dan ERD (Sedang berjalan).
 2. **Design:** Membuat Wireframe dan Schema Database.
 3. **Implementation (Sprints):** Koding fitur per fitur (Denah -> Auth -> Payment).
-4. **Testing:** Audit keamanan RLS dan validasi input.
+4. **Testing:** Audit keamanan middleware JWT, kontrol akses per resource, dan validasi input.
 5. **Deployment:** Go-live ke Vercel.
 6. **Review:** Evaluasi fitur berdasarkan kebutuhan Owner Kos.

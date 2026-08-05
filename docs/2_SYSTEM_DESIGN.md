@@ -13,9 +13,9 @@ CREATE TABLE rooms (
   status TEXT DEFAULT 'available'
 );
 
--- Tabel Profil Penghuni (Link to Supabase Auth)
+-- Tabel Profil Penghuni (Link to application users table)
 CREATE TABLE profiles (
-  id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
+  id UUID REFERENCES users(id) ON DELETE CASCADE PRIMARY KEY,
   full_name TEXT,
   phone TEXT,
   room_id UUID REFERENCES rooms(id),
