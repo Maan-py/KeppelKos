@@ -1,3 +1,5 @@
+import { authenticationToken, isAdmin } from "./middleware/auth.js";
+
 import express, { json } from "express";
 import cors from "cors";
 import { hash, compare } from "bcrypt";
@@ -6,7 +8,7 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "./generated/prisma/client.ts";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -59,7 +61,7 @@ app.post("/api/auth/register", async (req, res) => {
         password: hashedPassword,
         full_name: fullName,
         phone: phoneNumber,
-        role: "tenant",
+        role: "Tenant",
       },
     });
 
@@ -70,13 +72,13 @@ app.post("/api/auth/register", async (req, res) => {
         username: newUser.username,
         email: newUser.email,
         fullName: newUser.full_name,
-        phoneNumber: newUser.phone_number,
+        phoneNumber: newUser.phone,
         role: newUser.role,
       },
     });
   } catch (error) {
     console.error("Error saat registrasi: ", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Terjadi error saat registrasi",
     });
@@ -88,7 +90,7 @@ app.post("/api/auth/login", async (req, res) => {
     const { identifier, password } = req.body;
 
     if (!identifier || !password) {
-      res.status(400).json({
+      return res.status(400).json({
         status: "error",
         message: "Username/Email dan Password wajib diisi",
       });
@@ -101,7 +103,7 @@ app.post("/api/auth/login", async (req, res) => {
     });
 
     if (!user) {
-      res.status(401).json({
+      return res.status(401).json({
         status: "error",
         message: "Email/Username atau Password salah",
       });
@@ -110,7 +112,7 @@ app.post("/api/auth/login", async (req, res) => {
     const isPasswordValid = await compare(password, user.password);
 
     if (!isPasswordValid) {
-      res.status(401).json({
+      return res.status(401).json({
         status: "error",
         message: "Email/Username atau Password salah",
       });
@@ -133,14 +135,82 @@ app.post("/api/auth/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Error saat login: ", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Terjadi error saat login",
     });
   }
 });
 
-app.get("/api/rooms", (req, res) => {
+app.post("/api/rooms", authenticationToken, isAdmin, async (req, res) => {
+  try {
+    const { roomNumber, floor, bathroomType, price, status } = req.body;
+
+    if (!roomNumber || floor == undefined || !bathroomType || price == undefined || !status) {
+      return res.status(400).json({
+        status: "error",
+        message: "Semua field wajib diisi",
+      });
+    }
+
+    const validBathroomType = ["Dalam", "Luar"];
+
+    if (bathroomType && !validBathroomType.includes(bathroomType)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Tipe kamar mandi tidak valid! Hanya boleh diisi 'Dalam' atau 'Luar'",
+      });
+    }
+
+    const validStatuses = ["Available", "Occupied", "Maintenance"];
+
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Status kamar tidak valid! Hanya boleh diisi 'Available', 'Occupied, atau 'Maintenance'",
+      });
+    }
+
+    const newRoom = await prisma.rooms.create({
+      data: {
+        room_number: roomNumber,
+        floor: parseInt(floor),
+        bathroom_type: bathroomType,
+        price: BigInt(price),
+        ...(status && { status }),
+      },
+    });
+
+    const serializedRoom = {
+      ...newRoom,
+      price: newRoom.price.toString(),
+    };
+
+    res.status(201).json({
+      status: "success",
+      message: `Kamar ${roomNumber} berhasil ditambahkan!`,
+      data: serializedRoom,
+    });
+  } catch (error) {
+    console.error("Error tambah kamar: ", error);
+
+    if (error.code === "P2002") {
+      return res.status(400).json({
+        status: "error",
+        message: "Nomor kamar sudah terdaftar",
+      });
+    }
+
+    return res.status(500).json({
+      status: "error",
+      message: "Gagal menambahkan kamar",
+    });
+  }
+});
+
+app.get("/api/rooms", authenticationToken, (req, res) => {
+  console.log("User yang sedang login: ", req.user);
+
   res.json([
     {
       id: "uuid-1",

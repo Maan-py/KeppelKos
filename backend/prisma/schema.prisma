@@ -12,7 +12,7 @@ model payments {
   user_id    String         @db.Uuid
   amount     BigInt
   proof_url  String
-  status     payment_status @default(pending)
+  status     payment_status @default(Pending)
   created_at DateTime       @default(now()) @db.Timestamptz(6)
   users      users          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
@@ -23,7 +23,7 @@ model rooms {
   floor         Int
   bathroom_type bathroom_type
   price         BigInt
-  status        room_status   @default(available)
+  status        room_status   @default(Available)
   created_at    DateTime      @default(now()) @db.Timestamptz(6)
   users         users[]
 }
@@ -37,7 +37,7 @@ model users {
   phone             String
   emergency_contact String?
   ktp_url           String?
-  role              user_role  @default(tenant)
+  role              user_role  @default(Tenant)
   room_id           String?    @db.Uuid
   created_at        DateTime   @default(now()) @db.Timestamptz(6)
   payments          payments[]
@@ -45,22 +45,23 @@ model users {
 }
 
 enum bathroom_type {
-  dalam
-  luar
+  Dalam
+  Luar
 }
 
 enum payment_status {
-  pending
-  verified
-  rejected
+  Pending
+  Verified
+  Rejected
 }
 
 enum room_status {
-  available
-  occupied
+  Available
+  Occupied
+  Maintenance
 }
 
 enum user_role {
-  admin
-  tenant
+  Admin
+  Tenant
 }
