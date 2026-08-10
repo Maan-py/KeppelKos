@@ -183,7 +183,7 @@ app.post("/api/rooms", authenticationToken, isAdmin, async (req, res) => {
 
     const serializedRoom = {
       ...newRoom,
-      price: newRoom.price.toString(),
+      price: Number(newRoom.price),
     };
 
     res.status(201).json({
@@ -208,23 +208,183 @@ app.post("/api/rooms", authenticationToken, isAdmin, async (req, res) => {
   }
 });
 
-app.get("/api/rooms", authenticationToken, (req, res) => {
-  console.log("User yang sedang login: ", req.user);
+app.get("/api/rooms", authenticationToken, async (req, res) => {
+  try {
+    const rooms = await prisma.rooms.findMany({
+      orderBy: {
+        id: "asc",
+      },
+    });
 
-  res.json([
+    const serializedRooms = rooms.map((room) => {
+      return {
+        ...room,
+        price: Number(room.price),
+      };
+    });
+
+    res.status(200).json({
+      data: serializedRooms,
+    });
+  } catch (error) {
+    console.log("Error saat mengambil data kamar: ", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Gagal mengambil data kamar",
+    });
+  }
+});
+
+app.get("/api/rooms/:id", authenticationToken, async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const room = await prisma.rooms.findUnique({
+      where: {
+        room_number: id,
+      },
+    });
+
+    if (!room) {
+      return res.status(404).json({
+        status: "error",
+        message: "Kamar tidak ditemukan",
+      });
+    }
+
+    res.status(200).json({
+      data: {
+        ...room,
+        price: Number(room.price),
+      },
+    });
+  } catch (error) {
     {
-      id: "uuid-1",
-      roomNumber: "101",
-      status: "available",
-      price: 400000,
-    },
-    {
-      id: "uuid-2",
-      roomNumber: "102",
-      status: "occupied",
-      price: 500000,
-    },
-  ]);
+      console.log("Error saat mengambil data kamar: ", error);
+      return res.status(500).json({
+        status: "error",
+        message: "Gagal mengambil data kamar",
+      });
+    }
+  }
+});
+
+app.put("/api/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { roomNumber, floor, bathroomType, price, status } = req.body;
+
+    const room = await prisma.rooms.findUnique({
+      where: {
+        room_number: id,
+      },
+    });
+
+    if (!room) {
+      return res.status(404).json({
+        status: "error",
+        message: "Kamar tidak ditemukan",
+      });
+    }
+
+    const validBathroomType = ["Dalam", "Luar"];
+
+    if (bathroomType && !validBathroomType.includes(bathroomType)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Tipe kamar mandi tidak valid! Hanya boleh diisi 'Dalam' atau 'Luar'",
+      });
+    }
+
+    const validStatuses = ["Available", "Occupied", "Maintenance"];
+
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Status kamar tidak valid! Hanya boleh diisi 'Available', 'Occupied, atau 'Maintenance'",
+      });
+    }
+
+    const updatedRoom = await prisma.rooms.update({
+      where: {
+        room_number: id,
+      },
+      data: {
+        room_number: roomNumber || room.room_number,
+        bathroom_type: bathroomType || room.bathroom_type,
+        status: status || existingRoom.status,
+        floor: floor !== undefined ? Number(floor) : room.floor,
+        price: price !== undefined ? Number(price) : existingRoom.price,
+      },
+    });
+
+    const serializedRoom = {
+      ...updatedRoom,
+      price: Number(updatedRoom.price),
+    };
+
+    res.status(200).json({
+      status: "success",
+      message: "Data kamar berhasil diperbarui",
+      data: serializedRoom,
+    });
+  } catch (error) {
+    console.error("Error updating room:", error);
+    if (error.code === "P2002") {
+      return res.status(400).json({
+        status: "error",
+        message: "Nomor kamar tersebut sudah terdaftar! Gunakan nomor lain.",
+      });
+    }
+
+    res.status(500).json({
+      status: "error",
+      message: "Gagal memperbarui data kamar",
+    });
+  }
+});
+
+app.delete("/api/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const room = await prisma.rooms.findUnique({
+      where: {
+        room_number: id,
+      },
+    });
+
+    if (!room) {
+      return res.status(404).json({
+        status: "error",
+        message: "Kamar tidak ditemukan",
+      });
+    }
+
+    await prisma.rooms.delete({
+      where: {
+        room_number: id,
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Data kamar berhasil dihapus",
+    });
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    if (error.code === "P2025") {
+      return res.status(404).json({
+        status: "error",
+        message: "Kamar tidak ditemukan! Mungkin sudah dihapus sebelumnya.",
+      });
+    }
+
+    res.status(500).json({
+      status: "error",
+      message: "Gagal menghapus data kamar",
+    });
+  }
 });
 
 app.listen(PORT, () => {
