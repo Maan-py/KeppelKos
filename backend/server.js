@@ -1,4 +1,7 @@
 import { authenticationToken, isAdmin } from "./middleware/auth.js";
+import { validate } from "./middleware/validate.js";
+import { createRoomSchema, updateRoomSchema } from "./schema/room.schema.js";
+import { registerSchema, loginSchema } from "./schema/auth.schema.js";
 
 import express, { json } from "express";
 import cors from "cors";
@@ -27,16 +30,16 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/api/auth/register", async (req, res) => {
+app.post("/api/auth/register", validate(registerSchema), async (req, res) => {
   try {
-    const { username, email, password, fullName, phoneNumber } = req.body;
+    const { username, email, password, fullName, phoneNumber, emergencyContact } = req.body;
 
-    if (!username || !email || !password || !fullName || !phoneNumber) {
-      return res.status(400).json({
-        status: "error",
-        message: "Semua field wajib diisi",
-      });
-    }
+    // if (!username || !email || !password || !fullName || !phoneNumber) {
+    //   return res.status(400).json({
+    //     status: "error",
+    //     message: "Semua field wajib diisi",
+    //   });
+    // }
 
     const existingUser = await prisma.users.findFirst({
       where: {
@@ -62,6 +65,7 @@ app.post("/api/auth/register", async (req, res) => {
         full_name: fullName,
         phone: phoneNumber,
         role: "Tenant",
+        emergency_contact: emergencyContact,
       },
     });
 
@@ -85,16 +89,16 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-app.post("/api/auth/login", async (req, res) => {
+app.post("/api/auth/login", validate(loginSchema), async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
-    if (!identifier || !password) {
-      return res.status(400).json({
-        status: "error",
-        message: "Username/Email dan Password wajib diisi",
-      });
-    }
+    // if (!identifier || !password) {
+    //   return res.status(400).json({
+    //     status: "error",
+    //     message: "Username/Email dan Password wajib diisi",
+    //   });
+    // }
 
     const user = await prisma.users.findFirst({
       where: {
@@ -142,34 +146,9 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-app.post("/api/rooms", authenticationToken, isAdmin, async (req, res) => {
+app.post("/api/rooms", authenticationToken, isAdmin, validate(createRoomSchema), async (req, res) => {
   try {
     const { roomNumber, floor, bathroomType, price, status } = req.body;
-
-    if (!roomNumber || floor == undefined || !bathroomType || price == undefined || !status) {
-      return res.status(400).json({
-        status: "error",
-        message: "Semua field wajib diisi",
-      });
-    }
-
-    const validBathroomType = ["Dalam", "Luar"];
-
-    if (bathroomType && !validBathroomType.includes(bathroomType)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Tipe kamar mandi tidak valid! Hanya boleh diisi 'Dalam' atau 'Luar'",
-      });
-    }
-
-    const validStatuses = ["Available", "Occupied", "Maintenance"];
-
-    if (status && !validStatuses.includes(status)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Status kamar tidak valid! Hanya boleh diisi 'Available', 'Occupied, atau 'Maintenance'",
-      });
-    }
 
     const newRoom = await prisma.rooms.create({
       data: {
@@ -177,7 +156,7 @@ app.post("/api/rooms", authenticationToken, isAdmin, async (req, res) => {
         floor: parseInt(floor),
         bathroom_type: bathroomType,
         price: BigInt(price),
-        ...(status && { status }),
+        status: status,
       },
     });
 
@@ -237,11 +216,11 @@ app.get("/api/rooms", authenticationToken, async (req, res) => {
 
 app.get("/api/rooms/:id", authenticationToken, async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
 
     const room = await prisma.rooms.findUnique({
       where: {
-        room_number: id,
+        id: id,
       },
     });
 
@@ -269,14 +248,14 @@ app.get("/api/rooms/:id", authenticationToken, async (req, res) => {
   }
 });
 
-app.put("/api/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
+app.put("/api/rooms/:id", authenticationToken, isAdmin, validate(updateRoomSchema), async (req, res) => {
   try {
     const { id } = req.params;
     const { roomNumber, floor, bathroomType, price, status } = req.body;
 
     const room = await prisma.rooms.findUnique({
       where: {
-        room_number: id,
+        id: id,
       },
     });
 
@@ -287,34 +266,34 @@ app.put("/api/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
       });
     }
 
-    const validBathroomType = ["Dalam", "Luar"];
+    // const validBathroomType = ["Dalam", "Luar"];
 
-    if (bathroomType && !validBathroomType.includes(bathroomType)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Tipe kamar mandi tidak valid! Hanya boleh diisi 'Dalam' atau 'Luar'",
-      });
-    }
+    // if (bathroomType && !validBathroomType.includes(bathroomType)) {
+    //   return res.status(400).json({
+    //     status: "error",
+    //     message: "Tipe kamar mandi tidak valid! Hanya boleh diisi 'Dalam' atau 'Luar'",
+    //   });
+    // }
 
-    const validStatuses = ["Available", "Occupied", "Maintenance"];
+    // const validStatuses = ["Available", "Occupied", "Maintenance"];
 
-    if (status && !validStatuses.includes(status)) {
-      return res.status(400).json({
-        status: "error",
-        message: "Status kamar tidak valid! Hanya boleh diisi 'Available', 'Occupied, atau 'Maintenance'",
-      });
-    }
+    // if (status && !validStatuses.includes(status)) {
+    //   return res.status(400).json({
+    //     status: "error",
+    //     message: "Status kamar tidak valid! Hanya boleh diisi 'Available', 'Occupied, atau 'Maintenance'",
+    //   });
+    // }
 
     const updatedRoom = await prisma.rooms.update({
       where: {
-        room_number: id,
+        id: id,
       },
       data: {
         room_number: roomNumber || room.room_number,
         bathroom_type: bathroomType || room.bathroom_type,
-        status: status || existingRoom.status,
+        status: status || room.status,
         floor: floor !== undefined ? Number(floor) : room.floor,
-        price: price !== undefined ? Number(price) : existingRoom.price,
+        price: price !== undefined ? Number(price) : room.price,
       },
     });
 
@@ -350,7 +329,7 @@ app.delete("/api/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
 
     const room = await prisma.rooms.findUnique({
       where: {
-        room_number: id,
+        id: id,
       },
     });
 
@@ -363,7 +342,7 @@ app.delete("/api/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
 
     await prisma.rooms.delete({
       where: {
-        room_number: id,
+        id: id,
       },
     });
 
