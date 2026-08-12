@@ -7,8 +7,8 @@ import express, { json } from "express";
 import cors from "cors";
 import { hash, compare } from "bcrypt";
 import "dotenv/config";
-
 import jwt from "jsonwebtoken";
+import rateLimit from "express-rate-limit";
 
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "./generated/prisma/client.ts";
@@ -20,7 +20,29 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 // const prisma = new PrismaClient();
 
-app.use(cors());
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: {
+    status: "error",
+    message: "Terlalu banyak request, coba lagi nanti!",
+  },
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: { status: "error", message: "Terlalu banyak percobaan login, coba lagi nanti." },
+});
+
+app.use(limiter);
+app.use(cors(corsOptions));
 app.use(json());
 
 app.get("/", (req, res) => {
@@ -30,7 +52,7 @@ app.get("/", (req, res) => {
   });
 });
 
-app.post("/api/auth/register", validate(registerSchema), async (req, res) => {
+app.post("/api/auth/register", authenticationToken, isAdmin, validate(registerSchema), async (req, res) => {
   try {
     const { username, email, password, fullName, phoneNumber, emergencyContact } = req.body;
 
@@ -89,7 +111,7 @@ app.post("/api/auth/register", validate(registerSchema), async (req, res) => {
   }
 });
 
-app.post("/api/auth/login", validate(loginSchema), async (req, res) => {
+app.post("/api/auth/login", loginLimiter, validate(loginSchema), async (req, res) => {
   try {
     const { identifier, password } = req.body;
 
@@ -187,7 +209,7 @@ app.post("/api/rooms", authenticationToken, isAdmin, validate(createRoomSchema),
   }
 });
 
-app.get("/api/rooms", authenticationToken, async (req, res) => {
+app.get("/api/rooms", async (req, res) => {
   try {
     const rooms = await prisma.rooms.findMany({
       orderBy: {
@@ -214,7 +236,7 @@ app.get("/api/rooms", authenticationToken, async (req, res) => {
   }
 });
 
-app.get("/api/rooms/:id", authenticationToken, async (req, res) => {
+app.get("/api/rooms/:id", async (req, res) => {
   try {
     const { id } = req.params;
 

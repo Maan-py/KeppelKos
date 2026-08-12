@@ -21,7 +21,7 @@ export const createRoomSchema = z.object({
 export const updateRoomSchema = z.object({
   roomNumber: z.string().trim().min(3, "Nomor kamar wajib diisi").optional(),
   floor: z.coerce.number().int("Lantai harus berupa angka bulat").optional(),
-  bathroomType: z.string().min(1, "Tipe kamar mandi wajib diisi").optional(),
+  bathroomType: bathroomTypeEnum,
   price: z.coerce.number().nonnegative("Harga kamar tidak boleh minus").optional(),
   status: statusEnum.optional(),
 });

@@ -29,8 +29,8 @@ export const authenticationToken = (req, res, next) => {
 export const isAdmin = (req, res, next) => {
   if (req.user.role !== "Admin") {
     return res.status(403).json({
-      status: "eror",
-      messsage: "Akses ditolak! Fitur hanya untuk admin",
+      status: "error",
+      message: "Akses ditolak! Fitur hanya untuk admin",
     });
   }
 
