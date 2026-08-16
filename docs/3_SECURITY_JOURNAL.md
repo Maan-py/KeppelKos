@@ -10,4 +10,4 @@
 
 ### 🖼️ Image Sanitization & Compression
 
-**Alasan:** Menghapus metadata (EXIF) foto yang mungkin berisi lokasi GPS penghuni dan mengecilkan ukuran file agar tidak membebani storage gratisan Supabase.
+**Alasan:** Menghapus metadata (EXIF) foto yang mungkin berisi lokasi GPS penghuni dan mengecilkan ukuran file agar tidak membebani storage (Neon Object Storage).

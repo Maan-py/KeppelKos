@@ -27,7 +27,7 @@
 **🔗 Sumber Belajar:**
 
 - YouTube: _Programmer Zaman Now_ (Basis Data Dasar).
-- [Supabase Documentation: Database Design](https://supabase.com/docs/guides/database).
+- [Neon Documentation](https://neon.com/docs).
 
 ---
 

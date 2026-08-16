@@ -16,6 +16,7 @@ import { globalLimiter } from "./middlewares/rateLimit.js";
 
 import authRoutes from "./routes/auth.route.js";
 import roomRoutes from "./routes/room.route.js";
+import paymentRoutes from "./routes/payment.route.js";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -35,6 +36,7 @@ app.use(json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.get("/", (req, res) => {
   res.json({

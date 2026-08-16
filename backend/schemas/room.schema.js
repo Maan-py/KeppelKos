@@ -14,7 +14,7 @@ export const createRoomSchema = z.object({
   roomNumber: z.string().trim().min(3, "Nomor kamar wajib diisi"),
   floor: z.coerce.number().int("Lantai harus berupa angka bulat"),
   bathroomType: bathroomTypeEnum,
-  price: z.coerce.number().nonnegative("Harga kamar tidak boleh minus"),
+  price: z.coerce.bigint().nonnegative("Harga kamar tidak boleh minus"),
   status: statusEnum.optional(),
 });
 
@@ -22,7 +22,7 @@ export const updateRoomSchema = z.object({
   roomNumber: z.string().trim().min(3, "Nomor kamar wajib diisi").optional(),
   floor: z.coerce.number().int("Lantai harus berupa angka bulat").optional(),
   bathroomType: bathroomTypeEnum,
-  price: z.coerce.number().nonnegative("Harga kamar tidak boleh minus").optional(),
+  price: z.coerce.bigint().nonnegative("Harga kamar tidak boleh minus").optional(),
   status: statusEnum.optional(),
 });
 

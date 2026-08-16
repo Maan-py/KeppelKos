@@ -65,7 +65,7 @@ erDiagram
 - **State Management:** Pinia.
 - **Routing:** Vue Router.
 - **Back-End:** Node.js + Express.js.
-- **Database:** PostgreSQL (dihost di Supabase sebagai database saja).
+- **Database:** PostgreSQL (dihost di Neon) + Neon Object Storage (bukti bayar).
 - **Auth:** JWT di backend.
 - **UI:** Tailwind CSS + Lucide Icons.
 - **Security:** UUID, JWT, middleware authorization, Zod (Validation), Browser-Image-Compression.
