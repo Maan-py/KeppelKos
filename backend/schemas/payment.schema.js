@@ -14,5 +14,5 @@ export const uploadPaymentSchema = z.object({
 });
 
 export const verifyPaymentSchema = z.object({
-  status: paymentStatusEnum.optional(),
+  status: paymentStatusEnum,
 });

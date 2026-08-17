@@ -9,7 +9,7 @@
 
 ## 🟩 MINGGU 1 — Setup Neon Object Storage + Payment (Bukti Bayar)
 
-- [ ] **D1 — Setup Neon Object Storage + migrasi DB**
+- [x] **D1 — Setup Neon Object Storage + migrasi DB**
   - **Tetap pakai Neon** (batal pindah ke Supabase) — `DATABASE_URL` tidak berubah.
   - Aktifkan **Neon Object Storage** (beta, gratis; project sudah di region `us-east-2`).
   - Buat bucket `bukti-bayar` (**public_read** — baca publik, tulis pakai credential).
@@ -17,16 +17,16 @@
   - `prisma db push` + seed admin (DB tetap di Neon; tanpa keep-alive wajib, Neon auto-resume saat ada koneksi).
   - Buat `.env.example`.
   - Install `multer` + `@aws-sdk/client-s3` di `backend`.
-- [ ] **D2 — Upload helper**
+- [x] **D2 — Upload helper**
   - Module upload ke Neon Object Storage (S3 client) + middleware multer (filter jpg/png/webp, limit 5MB, nama file acak + uuid).
-- [ ] **D3 — `POST /api/payments`**
+- [x] **D3 — `POST /api/payments`**
   - Auth Tenant, upload bukti bayar → simpan `amount` + `proof_url` + status `Pending` ke tabel `payments`.
-- [ ] **D4 — `GET /api/payments` (tenant)**
+- [x] **D4 — `GET /api/payments` (tenant)**
   - Riwayat bayar user sendiri — **anti-IDOR**: paksa `user_id` dari token, bukan dari body/param.
-- [ ] **D5 — Admin: list + verifikasi**
+- [x] **D5 — Admin: list + verifikasi**
   - `GET /api/payments` semua pembayaran + info user.
   - `PATCH /api/payments/:id` approve/reject (Verified → set kamar user `Occupied`) pakai `$transaction`.
-- [ ] **D6 — Uji e2e + docs**
+- [x] **D6 — Uji e2e + docs**
   - Tes lengkap via Postman (upload → list → approve/reject), update collection + `docs/4_DEV_LOG.md`.
 
 ## 🟩 MINGGU 2 — Google OAuth (khusus Tenant)
@@ -63,8 +63,8 @@
   - Model + `prisma db push`, catat aksi admin (ubah kamar, verifikasi bayar).
 - [ ] **D19 — `GET /api/logs` (admin)**
   - Endpoint lihat audit log.
-- [ ] **D20 — `GET /api/stats` (admin)**
-  - Kamar terisi/kosong, Lunas vs Nunggak per bulan (aggregate query).
+- [/] **D20 — `GET /api/stats` (admin)**
+  - Kamar terisi/kosong ✅, Lunas vs Nunggak per bulan ❌ (belum ada aggregate query).
 - [ ] **D21 — Seed resmi + demo data**
   - `prisma/seed.js` + script `prisma db seed`: admin + 13 kamar + user contoh.
 - [ ] **D22 — Refactor controller/service layer + `$transaction`**

@@ -54,8 +54,8 @@ router.post("/register", authenticationToken, isAdmin, validate(registerSchema),
       data: {
         username: newUser.username,
         email: newUser.email,
-        fullName: newUser.full_name,
-        phoneNumber: newUser.phone,
+        full_name: newUser.full_name,
+        phone: newUser.phone,
         role: newUser.role,
       },
     });
@@ -94,7 +94,7 @@ router.post("/login", loginLimiter, validate(loginSchema), async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "24h" });
+    const token = jwt.sign({ user_id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
     res.status(200).json({
       status: "success",
@@ -104,7 +104,7 @@ router.post("/login", loginLimiter, validate(loginSchema), async (req, res) => {
         user: {
           id: user.id,
           username: user.username,
-          fullName: user.full_name,
+          full_name: user.full_name,
           role: user.role,
         },
       },

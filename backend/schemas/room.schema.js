@@ -27,5 +27,5 @@ export const updateRoomSchema = z.object({
 });
 
 export const roomParamsSchema = z.object({
-  id: z.string().min(3, "Parameter nomor kamar tidak valid"),
+  id: z.string().trim().min(3, "Parameter nomor kamar tidak valid"),
 });

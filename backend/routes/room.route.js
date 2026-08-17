@@ -16,7 +16,7 @@ const prisma = new PrismaClient({ adapter });
 
 const router = express.Router();
 
-router.post("/rooms", authenticationToken, isAdmin, validate(createRoomSchema), async (req, res) => {
+router.post("/", authenticationToken, isAdmin, validate(createRoomSchema), async (req, res) => {
   try {
     const { roomNumber, floor, bathroomType, price, status } = req.body;
 
@@ -57,7 +57,7 @@ router.post("/rooms", authenticationToken, isAdmin, validate(createRoomSchema), 
   }
 });
 
-router.get("/rooms", async (req, res) => {
+router.get("/", authenticationToken, async (req, res) => {
   try {
     const rooms = await prisma.rooms.findMany({
       orderBy: {
@@ -84,7 +84,7 @@ router.get("/rooms", async (req, res) => {
   }
 });
 
-router.get("/rooms/:id", async (req, res) => {
+router.get("/:id", authenticationToken, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -118,7 +118,7 @@ router.get("/rooms/:id", async (req, res) => {
   }
 });
 
-router.put("/rooms/:id", authenticationToken, isAdmin, validate(updateRoomSchema), async (req, res) => {
+router.put("/:id", authenticationToken, isAdmin, validate(updateRoomSchema), async (req, res) => {
   try {
     const { id } = req.params;
     const { roomNumber, floor, bathroomType, price, status } = req.body;
@@ -175,7 +175,7 @@ router.put("/rooms/:id", authenticationToken, isAdmin, validate(updateRoomSchema
   }
 });
 
-router.delete("/rooms/:id", authenticationToken, isAdmin, async (req, res) => {
+router.delete("/:id", authenticationToken, isAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 

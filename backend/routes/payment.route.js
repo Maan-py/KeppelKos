@@ -1,6 +1,7 @@
 import express from "express";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client.ts";
+
 import { uploadPaymentProof } from "../middlewares/upload.js";
 import { uploadPaymentSchema, verifyPaymentSchema } from "../schemas/payment.schema.js";
 import { getFileUrlFromNeon, uploadToNeon } from "../services/storage.service.js";
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.post("/", authenticationToken, uploadPaymentProof.single("paymentProof"), async (req, res) => {
   try {
+    console.log(req.user);
     if (!req.file) {
       return res.status(400).json({
         status: "error",
@@ -31,7 +33,7 @@ router.post("/", authenticationToken, uploadPaymentProof.single("paymentProof"),
     }
 
     const { amount } = validatedData.data;
-    const userId = req.user.userId;
+    const userId = req.user.user_id;
 
     const uploadedFile = await uploadToNeon(req.file);
 
@@ -49,7 +51,7 @@ router.post("/", authenticationToken, uploadPaymentProof.single("paymentProof"),
       data: {
         id: newPayment.id,
         amount: newPayment.amount.toString(),
-        proofUrl: newPayment.proof_url,
+        proof_url: newPayment.proof_url,
         status: newPayment.status,
       },
     });
@@ -64,10 +66,10 @@ router.post("/", authenticationToken, uploadPaymentProof.single("paymentProof"),
 
 router.get("/", authenticationToken, async (req, res) => {
   try {
-    const { userId, role } = req.user;
+    const { user_id, role } = req.user;
 
     const payments = await prisma.payments.findMany({
-      where: role === "Admin" ? {} : { user_id: userId },
+      where: role === "Admin" ? {} : { user_id },
       orderBy: {
         created_at: "desc",
       },
@@ -86,10 +88,56 @@ router.get("/", authenticationToken, async (req, res) => {
           id: payment.id,
           amount: payment.amount.toString(),
           status: payment.status,
-          createdAt: payment.created_at,
-          imageUrl: presignedUrl,
-          tenantName: payment.users.name,
-          roomId: payment.users.room_id,
+          created_at: payment.created_at,
+          image_url: presignedUrl,
+          tenant_name: payment.users.username,
+          room_id: payment.users.room_id,
+        };
+      }),
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Daftar pembayaran berhasil diambil",
+      data: formattedPayments,
+    });
+  } catch (error) {
+    console.error("Error fetching payments: ", error);
+    res.status(500).json({
+      status: "error",
+      message: "Terjadi kesalahan server saat mengambil daftar pembayaran.",
+    });
+  }
+});
+
+router.get("/history", authenticationToken, async (req, res) => {
+  try {
+    const userId = req.user.user_id;
+
+    const payments = await prisma.payments.findMany({
+      where: { user_id: userId },
+      orderBy: {
+        created_at: "desc",
+      },
+
+      select: {
+        id: true,
+        amount: true,
+        proof_url: true,
+        status: true,
+        created_at: true,
+      },
+    });
+
+    const formattedPayments = await Promise.all(
+      payments.map(async (payment) => {
+        const presignedUrl = await getFileUrlFromNeon(payment.proof_url);
+        return {
+          id: payment.id,
+          amount: payment.amount.toString(),
+          status: payment.status,
+          created_at: payment.created_at,
+          image_url: presignedUrl,
         };
       }),
     );

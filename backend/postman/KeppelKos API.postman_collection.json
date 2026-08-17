@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "KeppelKos API",
-    "description": "Collection untuk menguji API KeppelKos (auth & manajemen kamar). Jalankan login terlebih dahulu lalu salin token ke environment authToken.",
+    "description": "Collection untuk menguji API KeppelKos (auth, manajemen kamar, pembayaran, & pengguna). Jalankan login terlebih dahulu lalu salin token ke environment authToken.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -57,6 +57,20 @@
         },
         {
           "name": "POST /api/auth/register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -86,26 +100,62 @@
       "name": "Rooms",
       "item": [
         {
-          "name": "GET /api/rooms/rooms (List Kamar)",
+          "name": "GET /api/rooms (List Kamar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/rooms/rooms",
+              "raw": "{{baseUrl}}/api/rooms",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rooms", "rooms"]
+              "path": ["api", "rooms"]
             }
           }
         },
         {
-          "name": "GET /api/rooms/rooms/:id (Detail Kamar)",
+          "name": "GET /api/rooms/:id (Detail Kamar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
             "url": {
-              "raw": "{{baseUrl}}/api/rooms/rooms/:id",
+              "raw": "{{baseUrl}}/api/rooms/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rooms", "rooms", ":id"],
+              "path": ["api", "rooms", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -116,7 +166,21 @@
           }
         },
         {
-          "name": "POST /api/rooms/rooms (Tambah Kamar)",
+          "name": "POST /api/rooms (Tambah Kamar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -134,14 +198,28 @@
               "raw": "{\n  \"roomNumber\": \"A-101\",\n  \"floor\": 1,\n  \"bathroomType\": \"Dalam\",\n  \"price\": 850000,\n  \"status\": \"Available\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/rooms/rooms",
+              "raw": "{{baseUrl}}/api/rooms",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rooms", "rooms"]
+              "path": ["api", "rooms"]
             }
           }
         },
         {
-          "name": "PUT /api/rooms/rooms/:id (Update Kamar)",
+          "name": "PUT /api/rooms/:id (Update Kamar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "PUT",
             "header": [
@@ -159,9 +237,9 @@
               "raw": "{\n  \"roomNumber\": \"A-101\",\n  \"floor\": 1,\n  \"bathroomType\": \"Dalam\",\n  \"price\": 900000,\n  \"status\": \"Occupied\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/rooms/rooms/:id",
+              "raw": "{{baseUrl}}/api/rooms/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rooms", "rooms", ":id"],
+              "path": ["api", "rooms", ":id"],
               "variable": [
                 {
                   "key": "id",
@@ -172,7 +250,21 @@
           }
         },
         {
-          "name": "DELETE /api/rooms/rooms/:id (Hapus Kamar)",
+          "name": "DELETE /api/rooms/:id (Hapus Kamar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "DELETE",
             "header": [
@@ -182,9 +274,217 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/rooms/rooms/:id",
+              "raw": "{{baseUrl}}/api/rooms/:id",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "rooms", "rooms", ":id"],
+              "path": ["api", "rooms", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "POST /api/payments (Upload Bukti Bayar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "amount",
+                  "value": "850000",
+                  "type": "text"
+                },
+                {
+                  "key": "paymentProof",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/payments (List Pembayaran)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/payments/:id/verify (Verifikasi Pembayaran)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Verified\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/:id/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", ":id", "verify"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /api/users (List Tenant)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "PATCH /api/users/:id/assign-room (Assign Kamar)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is success', function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"room_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/:id/assign-room",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", ":id", "assign-room"],
               "variable": [
                 {
                   "key": "id",

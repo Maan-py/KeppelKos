@@ -63,9 +63,9 @@
 > **Role:** _Backend Developer_ & _Fullstack Engineer_.
 > **Pre-Req:** JavaScript Modern (Async/Await & Fetch).
 
-- [ ] **FS-01:** Setup project **Node.js + Express.js** dan koneksi ke PostgreSQL.
-- [ ] **FS-02:** Implementasi **JWT Auth** + middleware role/authorization.
-- [ ] **FS-03:** CRUD Logic (API data kamar & simpan bukti bayar).
+- [x] **FS-01:** Setup project **Node.js + Express.js** dan koneksi ke PostgreSQL.
+- [x] **FS-02:** Implementasi **JWT Auth** + middleware role/authorization.
+- [x] **FS-03:** CRUD Logic (API data kamar & simpan bukti bayar).
 - [ ] **FS-04:** Logic **Image Compression** di Browser (Hemat Storage).
 - [ ] **FS-05:** Konsistensi data via **service layer** dan **transaction handling**.
 
@@ -89,8 +89,8 @@
 > **Role:** _Cybersecurity Engineer_ & _DevOps_.
 > **Pre-Req:** Paham risiko dasar Web (OWASP Top 10).
 
-- [ ] **SEC-01:** Implementasi **verifyToken** dan authorization checks di Express.js.
-- [ ] **SEC-02:** Skema Validasi Form dengan **Zod** (Anti-Injection).
+- [x] **SEC-01:** Implementasi **verifyToken** dan authorization checks di Express.js.
+- [x] **SEC-02:** Skema Validasi Form dengan **Zod** (Anti-Injection).
 - [ ] **SEC-03:** Audit Keamanan internal (Simulasi serangan IDOR).
 - [ ] **DEP-01:** Deployment Production ke **Vercel**.
 - [ ] **DEP-02:** Konfigurasi Domain & SSL.
